@@ -1,0 +1,40 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# ── Virtual Environments ─────────────────────────────────────────────────────
+venv/
+.venv/
+env/
+
+# ── Streamlit ─────────────────────────────────────────────────────────────────
+.streamlit/secrets.toml
+
+# ── IDE / Editor ──────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.code-workspace
+*.swp
+*.swo
+
+# ── OS Files ──────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Excel temporary files ─────────────────────────────────────────────────────
+~$*
+
+# ── Raw ASI data (too large for GitHub — see docs/data_sources.md) ────────────
+data/raw/
+
+# ── Processed data (large Excel outputs from scripts/) ────────────────────────
+data/processed/
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log
