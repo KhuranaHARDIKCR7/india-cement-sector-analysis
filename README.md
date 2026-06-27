@@ -6,6 +6,8 @@
 
 An interactive **Streamlit** dashboard for analyzing production, emissions, fuel consumption, market concentration, and energy mix trends in India's cement sector using **Annual Survey of Industries (ASI)** microdata from 2009-10 to 2023-24.
 
+**🔗 Deployed App URL**: [india-cement-sector-analysis.streamlit.app](https://india-cement-sector-analysis-gvefvrjozntykmxxads27r.streamlit.app/)
+
 ---
 
 ## ✨ Features
@@ -18,7 +20,6 @@ An interactive **Streamlit** dashboard for analyzing production, emissions, fuel
 | 🔥 **Energy Mix** | Stacked area chart of fuel composition (Coal, Gas, Electricity, Petcoke, Other) |
 | 🗺️ **Coal Dependency** | State × Year heatmap of coal's share in total energy consumption |
 | 🌊 **Fuel → State Flow** | Sankey diagram showing fuel type consumption flows to states |
-| ⚡ **Emissions Intensity** | Horizontal bar chart of kg CO₂ per tonne of cement produced |
 
 Every page includes **KPI cards**, **interactive Plotly charts**, and **filter controls** for year and state selection.
 
@@ -74,7 +75,6 @@ The app will open at **http://localhost:8501**.
 │   ├── query_energy_mix.py       # Energy mix stacked area chart
 │   ├── query_coal_heatmap.py     # Coal dependency heatmap
 │   ├── query_sankey.py           # Fuel → State Sankey diagram
-│   ├── query_emissions_intensity.py # CO₂ emissions intensity
 │   ├── query_cagr.py             # State-wise CAGR chart
 │   └── query_market_concentration.py # Market concentration chart
 │

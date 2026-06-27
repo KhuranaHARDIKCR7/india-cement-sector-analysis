@@ -9,7 +9,6 @@ from src.query_production_trend import plot_production_trend
 from src.query_energy_mix import plot_energy_mix
 from src.query_coal_heatmap import plot_coal_heatmap
 from src.query_sankey import plot_sankey
-from src.query_emissions_intensity import plot_emissions_intensity
 from src.query_cagr import plot_cagr
 from src.query_market_concentration import plot_market_concentration
 
@@ -76,7 +75,6 @@ with st.sidebar:
         "🔥 Energy Mix": "energy",
         "🗺️ Coal Dependency": "heatmap",
         "🌊 Fuel → State Flow": "sankey",
-        "⚡ Emissions Intensity": "intensity",
     }
     selected_page = st.radio("Analysis", list(pages.keys()), label_visibility="collapsed")
     page_key = pages[selected_page]
@@ -205,36 +203,6 @@ elif page_key == "sankey":
 
     st.markdown("")
     st.plotly_chart(fig, use_container_width=True)
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-# PAGE: Emissions Intensity
-# ══════════════════════════════════════════════════════════════════════════════
-elif page_key == "intensity":
-    st.markdown("# ⚡ Emissions Intensity")
-    st.markdown("kg CO₂ emitted per tonne of cement produced — the key sustainability metric")
-
-    common_years = sorted(set(df_prod["year"]) & set(df_emis["year"]))
-    fy_labels = df_prod.drop_duplicates("year").set_index("year")["financial_year"]
-    sel_year = st.selectbox("Year", common_years, index=len(common_years) - 1,
-                            format_func=lambda y: fy_labels.get(y, str(y)), key="int_year")
-
-    fig, s = plot_emissions_intensity(df_prod, df_emis, year=sel_year)
-
-    if fig:
-        cols = st.columns(4)
-        for col, args in zip(cols, [
-            ("Avg Intensity", f"{s['avg_intensity']:.0f} kg", "CO₂ per tonne cement"),
-            ("Most Efficient", s["best_state"], f"{s['best_val']:.0f} kg CO₂/T"),
-            ("Least Efficient", s["worst_state"], f"{s['worst_val']:.0f} kg CO₂/T"),
-            ("States Compared", str(s["n_states"]), f"FY {s['fy']}"),
-        ]):
-            col.markdown(kpi_card(*args), unsafe_allow_html=True)
-
-        st.markdown("")
-        st.plotly_chart(fig, use_container_width=True)
-    else:
-        st.error("No overlapping years between production and emissions data.")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
