@@ -4,7 +4,7 @@ Run: py -m streamlit run app.py --server.headless true
 """
 
 import streamlit as st
-from src.load_data import load_production, load_emissions, load_fuel_combined
+from src.load_data import load_production, load_fuel_combined
 from src.query_production_trend import plot_production_trend
 from src.query_energy_mix import plot_energy_mix
 from src.query_coal_heatmap import plot_coal_heatmap
@@ -42,15 +42,10 @@ def get_production():
     return load_production()
 
 @st.cache_data
-def get_emissions():
-    return load_emissions()
-
-@st.cache_data
 def get_fuel():
     return load_fuel_combined()
 
 df_prod = get_production()
-df_emis = get_emissions()
 df_fuel = get_fuel()
 
 
@@ -233,27 +228,23 @@ elif page_key == "cagr":
 # PAGE: Market Concentration
 # ══════════════════════════════════════════════════════════════════════════════
 elif page_key == "concentration":
-    st.markdown("# 🏗️ Market Concentration")
-    st.markdown("How much of India's cement is produced by the top states?")
+    st.markdown("# 🏗️ Market Concentration — Pareto Analysis")
+    st.markdown("The 80/20 rule: how few states produce the bulk of India's cement?")
 
-    c1, c2 = st.columns([3, 1])
     all_years = sorted(df_prod["year"].unique())
     fy_labels = df_prod.drop_duplicates("year").set_index("year")["financial_year"]
-    with c1:
-        sel_years = st.multiselect("Years", all_years, default=all_years,
-                                   format_func=lambda y: fy_labels.get(y, str(y)), key="conc_years")
-    with c2:
-        top_n = st.slider("Top N states", 3, 10, 5, key="conc_n")
+    sel_years = st.multiselect("Years", all_years, default=all_years,
+                               format_func=lambda y: fy_labels.get(y, str(y)), key="conc_years")
 
-    fig, s = plot_market_concentration(df_prod, top_n=top_n, selected_years=sel_years)
+    fig, s = plot_market_concentration(df_prod, selected_years=sel_years)
 
     if fig:
         cols = st.columns(4)
         for col, args in zip(cols, [
-            ("Latest Share", f"{s['latest_share']:.0f}%", f"Top {s['top_n']} states · FY {s['latest_fy']}"),
-            ("Trend", s["trend"].title(), f"From {s['earliest_share']:.0f}% to {s['latest_share']:.0f}%"),
-            ("Top States", str(s["top_n"]), ", ".join(s["top_states"][:3]) + "..."),
-            ("Years", str(s["n_years"]), "Production data"),
+            ("80% Threshold", f"{s['pareto_states']} states", f"of {s['total_states']} producing states"),
+            ("Their Share", f"{s['latest_share']:.0f}%", f"FY {s['latest_fy']}"),
+            ("Top 3", ", ".join(s["top_states"][:3]), "By production volume"),
+            ("National Output", fmt(s["national_total"]), f"FY {s['latest_fy']}"),
         ]):
             col.markdown(kpi_card(*args), unsafe_allow_html=True)
 
@@ -261,3 +252,4 @@ elif page_key == "concentration":
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.error("Not enough data.")
+

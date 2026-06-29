@@ -1,15 +1,17 @@
 """
-query_market_concentration.py — Market Concentration of Top States
-Line chart: share of top-5 states in national production over time.
+query_market_concentration.py — Pareto Analysis of Cement Production
+Bar chart (descending production) + cumulative % line with 80% threshold.
+Shows how few states account for the majority of national output.
 """
 
 import plotly.graph_objects as go
 import pandas as pd
 
 
-def plot_market_concentration(df_prod, top_n=5, selected_years=None):
+def plot_market_concentration(df_prod, top_n=None, selected_years=None):
     """
-    Line chart showing top-N states' share of total national production by year.
+    Pareto chart: bars = state production (desc), line = cumulative %.
+    80% line highlights the Pareto threshold.
 
     Returns: (fig, summary_dict)
     """
@@ -17,72 +19,95 @@ def plot_market_concentration(df_prod, top_n=5, selected_years=None):
     if selected_years:
         df = df[df["year"].isin(selected_years)]
 
-    # National total by year
-    national = df.groupby(["year", "financial_year"])["total"].sum().reset_index()
-    national.columns = ["year", "financial_year", "national_total"]
+    # Use latest year for the Pareto snapshot
+    latest_year = df["year"].max()
+    latest = df[df["year"] == latest_year].copy()
+    fy_label = latest["financial_year"].iloc[0] if len(latest) > 0 else str(latest_year)
 
-    # Top N states (by average production across all years)
-    top_states = df.groupby("state")["total"].mean().nlargest(top_n).index.tolist()
+    # Aggregate by state, sort descending
+    state_totals = latest.groupby("state")["total"].sum().sort_values(ascending=False)
+    state_totals = state_totals[state_totals > 0]  # drop zero-production states
 
-    # Top N total by year
-    top_df = df[df["state"].isin(top_states)].groupby(["year", "financial_year"])["total"].sum().reset_index()
-    top_df.columns = ["year", "financial_year", "top_total"]
+    national_total = state_totals.sum()
+    cumulative_pct = state_totals.cumsum() / national_total * 100
 
-    merged = national.merge(top_df, on=["year", "financial_year"])
-    merged["top_share_pct"] = merged["top_total"] / merged["national_total"] * 100
-    merged["rest_share_pct"] = 100 - merged["top_share_pct"]
-    merged = merged.sort_values("year")
+    # Find 80% threshold
+    states_for_80 = (cumulative_pct <= 80).sum() + 1  # +1 because the state that crosses 80% counts
+    states_for_80 = min(states_for_80, len(state_totals))
 
     fig = go.Figure()
 
-    # Stacked area: top N vs rest
-    fig.add_trace(go.Scatter(
-        x=merged["financial_year"], y=merged["top_share_pct"],
-        name=f"Top {top_n} States", fill="tozeroy",
-        line=dict(color="#3b82f6", width=2),
-        hovertemplate=f"Top {top_n}: %{{y:.1f}}%<extra></extra>",
+    # Bars — color states inside 80% differently
+    bar_colors = ["#3b82f6" if i < states_for_80 else "#1e293b" for i in range(len(state_totals))]
+
+    fig.add_trace(go.Bar(
+        x=state_totals.index.tolist(),
+        y=state_totals.values,
+        name="Production (Tonnes)",
+        marker_color=bar_colors,
+        hovertemplate="%{x}: %{y:,.0f} T<extra></extra>",
+        yaxis="y",
     ))
+
+    # Cumulative % line
     fig.add_trace(go.Scatter(
-        x=merged["financial_year"], y=[100] * len(merged),
-        name=f"Remaining States", fill="tonexty",
-        line=dict(color="#64748b", width=0),
-        hovertemplate="Rest: %{customdata:.1f}%<extra></extra>",
-        customdata=merged["rest_share_pct"],
+        x=cumulative_pct.index.tolist(),
+        y=cumulative_pct.values,
+        name="Cumulative %",
+        mode="lines+markers",
+        line=dict(color="#f59e0b", width=2.5),
+        marker=dict(size=5),
+        hovertemplate="%{x}: %{y:.1f}%<extra></extra>",
+        yaxis="y2",
     ))
+
+    # 80% threshold line
+    fig.add_hline(
+        y=80, line_dash="dash", line_color="#ef4444", line_width=1.5,
+        annotation_text="80%", annotation_position="right",
+        annotation_font=dict(color="#ef4444", size=12),
+        yref="y2",
+    )
 
     fig.update_layout(
         template="plotly_dark",
         paper_bgcolor="#0e1117", plot_bgcolor="#0e1117",
-        font=dict(family="Inter", size=13),
-        xaxis=dict(title="Financial Year", showgrid=False, type="category"),
-        yaxis=dict(title="Share of National Production (%)", gridcolor="#1e293b",
-                   range=[0, 105]),
-        legend=dict(orientation="h", yanchor="top", y=-0.15, xanchor="center", x=0.5),
-        margin=dict(l=60, r=30, t=30, b=80),
-        height=450, hovermode="x unified",
+        font=dict(family="Inter", size=12),
+        xaxis=dict(title="State", showgrid=False, type="category",
+                   tickangle=-45, tickfont=dict(size=10)),
+        yaxis=dict(title="Production (Tonnes)", gridcolor="#1e293b",
+                   side="left"),
+        yaxis2=dict(title="Cumulative %", overlaying="y", side="right",
+                    range=[0, 105], showgrid=False,
+                    ticksuffix="%"),
+        legend=dict(orientation="h", yanchor="top", y=-0.35, xanchor="center", x=0.5),
+        margin=dict(l=70, r=70, t=30, b=120),
+        height=520, hovermode="x unified",
+        bargap=0.15,
     )
 
-    latest = merged.iloc[-1]
-    earliest = merged.iloc[0]
+    # Top states list (those within 80%)
+    top_states = state_totals.index[:states_for_80].tolist()
 
     summary = {
-        "top_n": top_n,
+        "top_n": states_for_80,
         "top_states": top_states,
-        "latest_share": latest["top_share_pct"],
-        "earliest_share": earliest["top_share_pct"],
-        "trend": "increasing" if latest["top_share_pct"] > earliest["top_share_pct"] else "decreasing",
-        "latest_fy": latest["financial_year"],
-        "n_years": len(merged),
+        "latest_share": cumulative_pct.iloc[states_for_80 - 1] if states_for_80 > 0 else 0,
+        "earliest_share": cumulative_pct.iloc[states_for_80 - 1] if states_for_80 > 0 else 0,
+        "trend": f"{states_for_80} of {len(state_totals)} states",
+        "latest_fy": fy_label,
+        "n_years": df["year"].nunique(),
+        "national_total": national_total,
+        "pareto_states": states_for_80,
+        "total_states": len(state_totals),
     }
 
     return fig, summary
 
 
 if __name__ == "__main__":
-    import sys
-    sys.path.insert(0, str(__import__('pathlib').Path(__file__).resolve().parent.parent))
-    from src.load_data import load_production
+    from load_data import load_production
     fig, s = plot_market_concentration(load_production())
-    print("Stats:", s)
+    print(f"Pareto: {s['pareto_states']} of {s['total_states']} states produce {s['latest_share']:.0f}%")
     print("Top states:", s["top_states"])
     fig.show()
