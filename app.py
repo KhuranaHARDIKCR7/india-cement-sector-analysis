@@ -113,12 +113,6 @@ if page_key == "trend":
     st.markdown("")
     st.plotly_chart(fig, use_container_width=True)
 
-    with st.expander("📊 View data table"):
-        filtered = df_prod[df_prod["year"].isin(sel_years)]
-        pivot = filtered.pivot_table(index="state", columns="financial_year",
-                                     values="total", aggfunc="sum").fillna(0)
-        st.dataframe(pivot.style.format("{:,.0f}"), use_container_width=True)
-
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PAGE: Energy Mix
