@@ -75,6 +75,8 @@ def plot_coal_heatmap(df_fuel, selected_years=None):
         margin=dict(l=150, r=30, t=30, b=60),
         height=max(400, len(pivot) * 28),
         coloraxis_colorbar=dict(title="Coal %", len=0.6),
+        xaxis = dict(type = 'category')
+        
     )
 
     avg_share = df["coal_share_pct"].mean()
