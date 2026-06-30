@@ -32,6 +32,7 @@ desktop.ini
 
 # ── Raw ASI data (too large for GitHub — see docs/data_sources.md) ────────────
 data/raw/
+data/*.xlsx
 
 # ── Processed data (large Excel outputs from scripts/) ────────────────────────
 data/processed/
