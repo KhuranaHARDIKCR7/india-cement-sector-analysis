@@ -63,9 +63,7 @@ def plot_market_concentration(df_prod, top_n=None, selected_years=None):
 
     # 80% threshold line
     fig.add_hline(
-        y=80, line_dash="dash", line_color="#ef4444", line_width=1.5,
-        annotation_text="80%", annotation_position="right",
-        annotation_font=dict(color="#ef4444", size=12),
+        y=80, line_dash="dash", line_color="rgba(239,68,68,0.5)", line_width=1.5,
         yref="y2",
     )
 
