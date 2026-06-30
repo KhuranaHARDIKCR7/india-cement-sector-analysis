@@ -233,10 +233,10 @@ elif page_key == "concentration":
 
     all_years = sorted(df_prod["year"].unique())
     fy_labels = df_prod.drop_duplicates("year").set_index("year")["financial_year"]
-    sel_years = st.multiselect("Years", all_years, default=all_years,
-                               format_func=lambda y: fy_labels.get(y, str(y)), key="conc_years")
+    sel_year = st.selectbox("Year", all_years, index=len(all_years) - 1,
+                            format_func=lambda y: fy_labels.get(y, str(y)), key="conc_year")
 
-    fig, s = plot_market_concentration(df_prod, selected_years=sel_years)
+    fig, s = plot_market_concentration(df_prod, selected_years=[sel_year])
 
     if fig:
         cols = st.columns(4)
