@@ -6,7 +6,7 @@
 
 An interactive **Streamlit** dashboard for analyzing production, emissions, fuel consumption, market concentration, and energy mix trends in India's cement sector using **Annual Survey of Industries (ASI)** microdata from 2009-10 to 2023-24.
 
-**🔗 Deployed App URL**: [india-cement-sector-analysis.streamlit.app](https://india-cement-sector-analysis-gvefvrjozntykmxxads27r.streamlit.app/)
+**🔗 Deployed App URL**: [india-cement-sector-analysis.streamlit.app](https://indian-cement-sector-analytics.streamlit.app/)
 
 ---
 
