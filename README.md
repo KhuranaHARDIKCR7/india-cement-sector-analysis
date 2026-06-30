@@ -79,31 +79,30 @@ The app will open at **http://localhost:8501**.
 │   └── query_market_concentration.py # Market concentration chart
 │
 ├── data/
-│   ├── State Annual Cement Prod.xlsx   # Consolidated production data
-│   ├── Fuel Consumption_Cement.xlsx    # Consolidated fuel & emissions data
+│   ├── State Annual Cement Prod.xlsx   # Consolidated production data (Omitted/Private)
+│   ├── Fuel Consumption_Cement.xlsx    # Consolidated fuel & emissions data (Omitted/Private)
 │   ├── processed/                      # Processed Excel outputs (gitignored)
-│   └── raw/                            # Raw ASI CSVs (gitignored — see docs/)
+│   └── raw/                            # Raw ASI CSVs (gitignored)
 │
 ├── scripts/                      # Offline data processing utilities
 │   ├── process_asi_openpyxl.py   # Cross-platform (openpyxl)
 │   └── process_asi_win32.py      # Windows-only (Excel COM)
 │
 └── docs/
-    └── data_sources.md           # How to obtain raw ASI data
+    └── data_sources.md           # Details on data privacy and processing pipelines
 ```
 
 ---
 
-## 📊 Data Sources
+## 📊 Data Sources & Privacy
 
-The dashboard reads from two consolidated Excel workbooks in `data/`:
+The dashboard is designed to read from two consolidated Excel workbooks in `data/`:
+* `State Annual Cement Prod.xlsx` (State-wise cement production)
+* `Fuel Consumption_Cement.xlsx` (Fuel consumption & emissions data)
 
-| File | Contents |
-|------|----------|
-| `State Annual Cement Prod.xlsx` | State-wise cement production (plaster, quicklime, clinkers, portland cement, dolomite) |
-| `Fuel Consumption_Cement.xlsx` | Block H/I fuel consumption, emissions data, and total emissions pivot |
+These files were generated from unit-level **Annual Survey of Industries (ASI)** microdata published by the [Ministry of Statistics & Programme Implementation (MoSPI)](https://www.mospi.gov.in/). 
 
-These were generated from **Annual Survey of Industries (ASI)** microdata published by the [Ministry of Statistics & Programme Implementation (MoSPI)](https://www.mospi.gov.in/). See [`docs/data_sources.md`](docs/data_sources.md) for details on obtaining the raw data.
+> 🔒 **Data Omission Notice:** In compliance with the **Data Usage Agreement / NDA** signed for this internship, all raw and consolidated data files are kept private and omitted from this public repository. See [`docs/data_sources.md`](docs/data_sources.md) for more details on data privacy and compliance.
 
 ---
 
@@ -120,12 +119,14 @@ The app will automatically install from `requirements.txt` and use the theme fro
 
 ## 🛠️ Data Processing Scripts
 
-The `scripts/` folder contains utilities for processing raw ASI CSV data into the consolidated Excel workbooks. These are **not required** to run the dashboard — only to regenerate the data files from scratch.
+The `scripts/` folder contains utilities for processing raw unit-level ASI CSV data into the consolidated Excel workbooks:
 
 | Script | Platform | Description |
 |--------|----------|-------------|
 | `process_asi_openpyxl.py` | Cross-platform | Uses `openpyxl` to copy template worksheets, insert raw CSV records, and update formula references |
 | `process_asi_win32.py` | Windows only | Uses Excel COM automation (`win32com`) for native formula evaluation and pivot table refresh |
+
+*(Note: These scripts are provided for code-review purposes only. They cannot be executed without the raw unit-level ASI microdata, which is omitted due to privacy agreements).*
 
 ---
 
