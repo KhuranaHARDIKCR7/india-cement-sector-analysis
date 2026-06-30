@@ -47,8 +47,12 @@ python scripts/process_asi_win32.py
 
 These scripts read from `data/raw/`, use template workbooks from `data/processed/ASI_DATA_2014_15_CSV/` as a reference, and output processed Excel files to `data/processed/`.
 
-### Why Raw Data Is Not Included
+### Data Privacy & Omission of Datasets
 
-The raw ASI CSV files total over **100 MB per year** (11 years ≈ 1+ GB). GitHub has a 100 MB per-file limit and discourages repositories larger than 1 GB. The raw data is therefore excluded via `.gitignore`.
+Both the raw unit-level ASI CSV files and the consolidated Excel workbooks (`data/State Annual Cement Prod.xlsx` and `data/Fuel Consumption_Cement.xlsx`) are **not included** in this public repository.
 
-The two consolidated workbooks (`data/State Annual Cement Prod.xlsx` and `data/Fuel Consumption_Cement.xlsx`) contain all the aggregated data needed to run the dashboard and are included in the repository.
+#### Why the Data is Kept Private:
+* **Data Usage Agreement**: The datasets are compiled from unit-level government microdata (Ministry of Statistics & Programme Implementation, India) and are subject to a strict **Data Usage Agreement** signed for the internship. 
+* **Compliance**: To comply with these legal terms and prevent unauthorized distribution of unit-level government database records, all data files are kept private.
+* **Purpose of this Repository**: This public repository serves as a portfolio showcase of the dashboard's software architecture, data cleaning pipelines, and interactive visualization logic.
+
